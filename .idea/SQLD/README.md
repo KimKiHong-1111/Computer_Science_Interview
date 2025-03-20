@@ -298,3 +298,166 @@ SQL에서 기본 제공되는 함수를 내장 함수라 한다.
 STSDATE만 알아두기 (연월일 출력가능)
 
 #### CASE 함수
+- ► CASE WHEN <조건식1> THEN <반환값1>  
+WHEN <조건식2> THEN <반환값2> ...  
+END  
+<조건식1> 에 만족하면, <반환값1> 을 출력하고,  
+<조건식2>에 만족하면, <반환값2>을 출력한다.  
+
+
+- CASE WHEN <조건식1> THEN <반환값1>  
+WHEN <조건식2> THEN <반환값2> ... 
+ELSE   
+END    
+ELSE 절을 사용하는 경우 :
+<조건식1> 에 맞는 경우, <조건식2>에 맞는 경우를
+제외한 경우 ELSE 의 <반환값> 이 반환된다.
+ELSE 절을 사용하지 않는 경우 :
+<조건식1> 에 맞는 경우, <조건식2>에 맞는 경우를
+제외한 경우 NULL 이 반환된다.
+#### DECODE 함수
+- DECODE (<컬럼명>, <값1>, <반환값1>,  
+<값2>, <반환값2>,  
+<값3>, <반환값3>, ... )  
+<컬럼명>이 <값1>이면 <반환값1>을 가져오고,  
+<값2>이면 <반환값2>를 가져오고 <값3>이면  
+<반환값3>를 가져온다.  
+<컬럼명> 이 <값1>, <값2>, <값3> 모두 같지 않는  
+경우에는 NULL 이 반환된다.  
+#### NULL
+- 데이터의 값이 알려져 있지 않거나 의미가 없는
+  경우에 NULL을 사용한다. 즉, NULL은 값의 부재 혹은
+  모르는 값
+  NULL 산술연산
+  NULL 과의 산술연산은 모두 NULL로 출력된다.
+  ►SELECT NULL+2, NULL-2, NULL/2, 2/NULL
+  FROM DUAL;
+  NULL과의 비교연산 – IS NULL / IS NOT NULL
+  ►SELECT EMPNO, COMM FROM EMP WHERE
+  COMM IS NULL;
+  ►SELECT EMPNO, COMM FROM EMP WHERE
+  COMM IS NOT NULL;
+  NULL 관련 함수
+- NVL(값1,값2) : 값1의 값이 NULL 이면 값2 출력.
+- NULLIF(값1,값2) : 값1이 값2와 같으면 NULL을
+  아니면 값1을 출력
+- COALESCE(값1,값2) : NULL이 아닌 최초의
+  표현식, 모두 NULL이면 NULL 반환
+  e.g. COALESCE(NULL, NULL, ‘abc’) -> ‘abc’
+
+##### NULL의 특징 (시험 자주 나옴)
+1. 기본적인 의미는 값의 부재, 모르는 값을 의미한다.
+2. 정렬에서는 무한대의 의미를 가진다. (Oracle) 내림차순하면 맨앞에 나옴
+3. 정렬에서는 최소의 값이라는 의미를 가진다. (SQLServer) 내림차순하면 맨 뒤에 나옴
+4. NULL/2 , 2/NULL, NULL+NULL, NULL-2 모두
+   NULL값으로 출력된다.
+5. (SELECT 절에서) NULL = 3 등의 비교연산 시,
+   UNKNOWN(알수 없음) 이 반환되어 오류가 발생한다.
+   (WHERE 절에서) NULL = 3 등의 비교연산 시,
+   UNKNOWN(알수 없음)이 조건절(WHERE)에 들어가서
+   거짓(FALSE)의 결과와 같은 결과가 반환된다.
+
+##### ORDER BY (최후에 수행 //정렬은 메모리공간을 많이 잡아먹는다.)
+- SELECT 문을 통해 얻어온 결과를 특정 컬럼을 기준으로 오름차순 혹은 내림차순으로 정렬할 수
+있다.WHERE, ROWNUM 등과 함께 쓸 수 있다.
+숫자, 문자열, 날짜 등 모든 타입의 데이터를 정렬할
+수 있다.  
+ORDER BY 의 정렬 시점은 모든 실행이 끝난 이후,
+데이터 출력 전이다.
+ORDER BY 는 데이터 베이스의 메모리를 많이
+사용한다. (성능 저하의 요인이 된다.)  
+► SELECT <컬럼명> FROM <테이블명>
+ORDER BY <컬럼명> [ ASC | DESC ];  
+ASC : 오름차순 (생략가능),
+DESC : 내림차순
+
+- 컬럼 번호를 이용한 정렬  
+►SELECT EMPNO, ENAME, SAL FROM EMP
+ORDER BY 3 ASC;  
+출력되는 결과의 컬럼의 번호를 기준으로 정렬하는
+것이 가능하다.  
+하지만, 출력되는 결과의 컬럼 숫자보다 큰 값을
+이용하여 정렬하면 오류가 발생한다.
+
+- 출력 되지 않는 컬럼을 이용한 정렬
+►SELECT EMPNO,ENAME,DEPTNO
+FROM EMP
+ORDER BY SAL DESC;  
+복수 컬럼을 이용한 정렬  
+►SELECT ENAME, SAL,COMM FROM EMP
+ORDER BY SAL DESC, ENAME ASC;  
+먼저 SAL 내림차순으로 정렬하고 
+SAL가 같다면 ENAME 오름차순으로 정렬한다.
+
+###### 정렬의 특징
+∙ 숫자, 문자열, 날짜 등 모든 타입의 데이터를 정렬할
+수 있다.  
+∙ ORDER BY 의 정렬 시점은 모든 조회(SELECT)가
+끝난 이후이다  
+∙ ORDER BY 는 데이터 베이스의 메모리를 많이
+사용한다. (데이터 조회 성능 저하의 요인이 된다.)
+
+
+
+#### 집계함수  
+► SUM (<컬럼명>) : 컬럼 값들의 총합을 구한다  
+► AVG (<컬럼명>) : 컬럼 값들의 평균을 구한다  
+► COUNT (<컬럼명>) : 컬럼 값들의 총 개수을  
+구한다  
+► MAX (<컬럼명>) : 컬럼 값들의 최대값을 구한다  
+► MIN (<컬럼명>) : 컬럼 값들의 최소값을 구한다
+
+##### 집계함수와 NULL의 관계
+- (원칙) : 집계 함수는 NULL을 제외하고 연산하는 것이
+원칙이다.
+- (예외) : COUNT(*) 는 행의 수를 센다.(null포함하여 연산)
+
+- 집계함수 WHERE 절에 사용 불가
+집계함수는 WHERE 절에 올 수 없다. (집계 함수를
+사용할 수 있는 GROUP BY 절보다 WHERE절이 먼저
+수행된다. )  
+
+►SELECT EMPNO,ENAME, SAL  
+FROM EMP  
+WHERE SAL>AVG(SAL) [오류발생]  
+
+집계함수 ORDER BY 절 사용 가능  
+
+► SELECT DEPTNO, MAX(SAL)  
+FROM EMP  
+GROUP BY DEPTNO  
+ORDER BY MAX(SAL);  
+
+
+#### GROUP BY
+데이터들을 기준컬럼에 따라서 원하는 그룹으로 나눌
+수 있다.  
+개체 속성들은 GROUP BY를 기점으로
+그룹수준의 속성들이 된다.  
+► GROUP BY <컬럼명>  
+► SELECT  
+FROM  
+WHERE  
+GROUP BY <컬럼명>  
+
+
+HAVING  
+그룹수준 속성들의 조건절에 해당
+
+
+#### GROUP BY NULL  (전체 행들을 하나의 그룹으로 보겠다)
+
+
+SELECT SUM(SAL)  
+FROM EMP  
+GROUP BY NULL;  
+SELECT SUM(SAL)  
+FROM EMP;
+
+#### 그룹함수
+
+ROLLUP (인수 한 개)
+
+###### GROUPING SETS
+GROUPING SETS는 각 인수들의 GROUP BY 결과를
+합친 결과이다.
