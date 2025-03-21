@@ -192,6 +192,14 @@ Barker 표기법
 
 # 2과목 SQL기본 및 활용
 
+FROM  
+WHERE  
+GROUP BY  
+HAVING  
+SELECT  
+ORDER BY  
+
+
 ### SQL 명령어
  SQL - Structured Query Language
  ##### 명령어 구분 문제 나온다!
@@ -461,3 +469,351 @@ ROLLUP (인수 한 개)
 ###### GROUPING SETS
 GROUPING SETS는 각 인수들의 GROUP BY 결과를
 합친 결과이다.
+
+###### ROLLUP : 인수가 두 개 이상인 경우
+ROLLUP(A,B) 로 인수가 두개인 경우에는 ROLLUP의
+결과값을 다음과 같이 구할 수 있다.  
+ROLLUP(A,B) = GROUPING SETS((A,B))+ GROUPINGS
+SETS(A) + GROUPING SETS(NULL)
+
+###### 정리 : 그룹함수 인수 2개인 경우
+
+###### GROUP BY 그룹함수 (A,B)
+
+ROLLUP : GROUP BY A,B + GROUP BY A + GROUP
+BY NULL  
+CUBE : GROUP BY A,B + GROUP BY A + GROUP BY
+B + GROUP BY NULL  
+GROUPING SETS : GROUP BY A + GROUP BY B  
+
+###### 그룹함수의 특징
+###### ROLLUP :   
+ROLLUP의 인수는 계층구조이므로 인수
+순서가 바뀌면 수행 결과도 바뀐다.  
+ROLLUP(DEPTNO,MGR) ≠ ROLLUP(MGR,DEPTNO)
+###### CUBE :   
+다차원 집계 함수이므로, 시스템 부하가
+ROLLUP 보다 크다  
+CUBE의 인수들은 평등한 관계이므로, 순서는
+무관하다. (CUBE(DEPTNO,MGR) = CUBE(MGR,
+DEPTNO))  
+###### GROUPING SETS :   
+GROUPING SETS의 인수들은
+평등한 관계이므로, 순서는 무관하다. (GROUPING
+SETS(DEPTNO,MGR) = GROUPING SETS(MGR,
+DEPTNO))
+###### 윈도우 함수  
+개별 데이터들에 대한 연산 결과를 출력해주는 분석
+함수(Analytical Function)
+
+###### PARTITION BY :   
+GROUP BY 와 비슷한 역할,
+기준컬럼에 따라서 윈도우 함수 처리 범위를 모으는
+역할
+###### ORDER BY :   
+정렬작업으로 행과 행간의 관계를
+정의해주는 역할
+###### WINDOWING 절 :   
+값의 처리 범위를 정의
+
+###### 집계함수
+► <집계함수> (<집계 대상 컬럼명>) OVER (PARTITION BY
+<집계할 대상의 범위> ORDER BY <정렬 기준 컬럼 >
+ROWS <행의 수> PRECEDING)  
+► <집계함수> (<집계 대상 컬럼명>) OVER (PARTITION BY
+<집계할 대상의 범위> ORDER BY <정렬 기준 컬럼 >
+ROWS BETWEEN <행의 수1> AND <행의 수2>)  
+► <집계함수> (<집계 대상 컬럼명>) OVER (PARTITION BY
+<집계할 대상의 범위> ORDER BY <정렬 기준 컬럼 >
+RANGE <값> PRECEDING)  
+► <집계함수> (<집계 대상 컬럼명>) OVER (PARTITION BY
+<집계할 대상의 범위> ORDER BY <정렬 기준 컬럼 >
+RANGE BETWEEN <값1> AND <값2> )
+
+###### 행 순서 함수
+- FIRST_VALUE (<값>) : 윈도우에서 가장 처음에 나오는
+값을 구한다.
+- LAST_VALUE (<값>) : 윈도우에서 가장 나중에 나오는
+값을 구한다.
+- LAG (<값>, <숫자1>, <숫자2>) : 파티션에서 <값>에
+대하여 현재행 이전 <숫자1>행의 값을 구한다. 그
+값이 없다면 <숫자2>를 반환한다.
+- LEAD (<값>, <숫자1>, <숫자2>) :파티션에서 <값> 에
+대하여 현재행 이후 <숫자1>행의 값을 구한다. 그
+값이 없다면 <숫자2>를 반환한다.
+
+###### 비율 관련 함수
+- RATIO_TO_REPORT : 파티션 내 전체 SUM(컬럼)값에
+대한 행별 칼럼 값의 백분율을 소수점으로 구할 수
+있다.  
+- CUME_DIST : 파티션 전체 건수에서 동일한 할당을
+나누었을때, 누적 백분율을 조회한다. (누적 분포상
+위치를 0~1사이 값을 가진다.)  
+- PERCENT_RANK : 파티션에 제일 먼저 나온 것을
+0으로 제일 늦게 나온 것을 1로 하여, 값이 아닌 행의
+순서별 위치 백분율을 조회한다. <중위값, Q1,Q2,Q3>  
+- NTILE(n) : 파티션 별로 N등분하여 조를 나눈다. 이때
+나머지는 상위 조에게 순서대로 배정되게 한다.
+
+###### CROSS JOIN
+조건 없이 2개의 테이블을 하나로 조인하는 것이다.
+카테시안 곱(Cartesian Product)이 발생한다.  
+.  
+SELECT A.EMPNO , A.ENAME , B.DEPTNO ,
+B.DNAME
+FROM EMP A , DEPT B
+WHERE B.DEPTNO = A.DEPTNO ;
+
+  
+SELECT A.EMPNO , A.ENAME , B.DEPTNO ,
+B.DNAME
+FROM EMP A JOIN DEPT B
+ON B.DEPTNO = A.DEPTNO ;  
+
+
+###### NATURAL JOIN의 특징
+1. USING, ON, WHERE 절로 조인 조건 절을 서술할
+   필요가 없다.
+2. 공통 컬럼을 자동적으로 찾아서 조인한다.
+3. OUTER JOIN 에서도 사용 가능하다. 
+
+
+###### 외부조인 (OUTER JOIN)
+   OUTER JOIN은 선행 테이블(좌측 테이블) 혹은 후행
+   테이블(우측 테이블)을 기준으로 조인 조건에
+   만족하지 않는 행들을 포함하여 출력한다.  
+   LEFT JOIN  
+   ▶SELECT  
+   FROM <테이블 명 1> LEFT OUTER JOIN <테이블 명
+   2> ON <조인 조건식>  
+   ▶SELECT  
+   FROM <테이블 명 1> LEFT OUTER JOIN <테이블 명
+   2> ON <조인 조건식>  
+
+###### LEFT JOIN
+▶SELECT  
+FROM <테이블 명 1> LEFT OUTER JOIN <테이블 명
+2> ON <조인 조건식>  
+▶SELECT  
+FROM <테이블 명 1> LEFT OUTER JOIN <테이블 명
+2> ON <조인 조건식>
+
+###### RIGHT JOIN
+▶SELECT  
+FROM <테이블 명 1> RIGHT OUTER JOIN <테이블
+명 2> ON <조인 조건식>  
+▶SELECT  
+FROM <테이블 명 1>,<테이블 명 2>
+WHERE <테이블 명1 컬럼> (+) = <테이블명2 컬럼>
+셀프조인(SELF JOIN)
+
+부모노드에서 부터 자식노드까지 데이터들을 전개하는
+것을 순방향 전개라고 한다.  
+셀프 조인에서는 두개 이상의 동일한 테이블을
+이용해서 조인이 이루어지는데, 동일 테이블 각각의
+역할이 다르다  
+###### 계층형 질의  
+부모와 자식, 상사와 부하와 같은 구조를 계층형
+구조라고 부른다. ORACLE에서는 이러한 계층형
+데이터를 분석하기 위한 기능을 제공한다. 이를
+계층형 질의라고 한다.  
+※ 계층형 질의는 SQL SERVER에서 지원하지 않는다  
+
+
+► SELECT EMPNO, ENAME, MGR,  
+CONNECT_BY_ISLEAF, LEVEL    
+FROM EMP    
+WHERE <조건절>    
+START WITH MGR IS NULL    
+CONNECT BY PRIOR EMPNO=MGR;  
+
+START WITH : 계층 구조 전개의 시작위치 (루트
+데이터, 부모 데이터의 정보)  
+CONNECT BY : 다음에 전개될 자식데이터를 지정한다.  
+계층형 전개의 조건식으로, 자식 데이터는 CONNECT
+BY 절에 주어진 조건을 만족해야 한다.  
+PRIOR : CONNECT BY 절에 사용되며, 이전 레벨
+데이터를 지칭할 때 쓴다.
+WHERE : 모든 전개 수행 후에, 지정된 조건을
+만족하는 데이터만을 추출한다. ※ 계층 데이터 형성
+후 가장 마지막에 적용되는 조건이다.  
+CONNECT BY PRIOR 자식컬럼 = 부모컬럼 
+부모에서 자식으로 트리 그리기 : 순방향 전개
+###### 가상컬럼  
+LEVEL : 루트 데이터면 1 하위 데이터이면 2이다.
+리프(Leaf) 데이터까지 1씩 증가한다.  
+CONNECT_BY_ISLEAF : 전개 과정에서 해당 데이터가
+리프 데이터이면 1, 그렇지 않으면 0이다.  
+SYS_CONNECT_BY_PATH(<컬럼명>, ‘<경로분리자>’) :
+루트 데이터부터 현재 전개할 데이터까지의 경로를
+표시한다.  
+CONNECT_BY_ROOT(<컬럼명>) : 현재 전개할
+데이터의 루트 데이터를 표시한다.  
+※ CONNECT_BY_ROOT 에서 최상위 관리자 본인의
+이름도 등장한다.  
+###### 서브쿼리
+쿼리문(메인쿼리) 안에 들어가는 쿼리문(서브쿼리)
+쿼리문 작성시 사용되는 값을 다른 쿼리에서 구해야
+할 경우 사용한다.  
+###### 반환 결과에 따른 서브쿼리 분류
+
+###### INLINE VIEW (인라인뷰)
+FROM 구에 SELECT문을 사용하여 가상의 테이블을
+만드는 효과가 있다.  
+###### 상호연관 서브쿼리  
+SELECT A.ENAME, A.SAL, A.DEPTNO
+FROM EMP A  
+WHERE A.SAL > (SELECT AVG(B.SAL)
+FROM EMP B  
+WHERE A.DEPTNO = B.DEPTNO);  
+###### 다중행 서브쿼리 연산자  
+IN : 서브쿼리의 결과 중 하나라도 일치하면 조건은
+TRUE  
+ANY,SOME : 서브쿼리의 결과와 하나이상 일치하면
+조건은 TRUE  
+ALL : 서브쿼리의 결과와 모두 일치해야 조건이
+참이된다.  
+EXISTS : 데이터의 존재 여부를 확인하는 쿼리에
+해당한다. (만족하는 값이 없으면 공집합을 반환)  
+
+###### 집합연산자 (수직결합)
+UNION : 합집합 <중복된 것 배제, 정렬의 의미를
+포함>  
+UNION ALL : 합집합, 중복된 데이터를 모두 가져온다.
+<정렬 없음>  
+INTERSECT : 교집합 <중복된 것 배제>  
+MINUS : 차집합 <MS SQL에서는 EXCEPT>, <중복된
+것 배제>
+
+
+###### 테이블명, 컬럼명 명명 규칙
+- 테이블명과 칼럼명은 반드시 문자로 시작해야한다.
+- A-Z,a-z,0-9,
+- 특수문자는 _, $, #만 사용 가능
+
+###### 제약조건
+목적 : 데이터의 무결성 유지   
+UNIQUE KEY(고유키) : 고유키 정의  
+NOT NULL : NULL 값 입력금지  
+PRIMARY KEY(기본키) : UNIQUE & NOT NULL  
+CHECK : 입력 값 범위 제한  
+FOREIGN KEY(외래키) : NULL 가능,
+
+###### 테이블 생성
+CREATE TABLE 테이블명 (컬럼명 데이터유형
+제약조건);
+테이블 구조 변경
+- 컬럼 추가 : ALTER TABLE 테이블명 ADD(컬럼명
+  데이터유형);
+- 삭제 : ALTER TABLE 테이블명 DROP COLUMN
+  컬럼명;
+- 수정 : ALTER TABLE 테이블명 MODIFY
+  (컬럼명 데이터유형 제약조건);  
+  제약조건 삭제 : DROP CONSTRAINT 제약조건명;  
+  제약조건 추가 : ADD CONSTRAINT 제약조건명 조건  
+  테이블명 변경 : RENAME 변경전 테이블명 TO  
+  변경후 테이블명;  
+  테이블 삭제 : DROP TABLE 테이블명;  
+  테이블 데이터 삭제 : TRUNCATE TABLE 테이블명;  
+  컬럼명 변경 : RENAME COLUMN 변경전 컬럼명 TO  
+  변경 후 컬럼명
+
+###### INSERT
+INSERT INTO TABLE (<컬럼명1>,<컬럼명2>,...)  
+VALUES(<값1>,<값2>,...);  
+VALUES의 로우 정보값  
+i) 문자열일 경우, ‘’ 를 붙여서 입력  
+ii) 숫자일 경우, ‘’ 없이 입력  
+1. 데이터의 추가  
+   INSERT INTO EXAMPLE (EMPNO,ENAME,JOB)  
+   VALUES(1000,’김강민’,’인사’);  
+2. 컬럼목록을 생략하는 경우 데이터의 추가  
+   INSERT INTO EXAMPLE  
+   VALUES(1001, ‘이성우’ ,’영업’);  
+3. 컬럼 목록에 모든 컬럼이 있지 않는 경우  
+   INSERT INTO EXAMPLE (EMPNO,ENAME)  
+   VALUES(1002,’김영희’);  
+
+###### UPDATE
+UPDATE <테이블명>  
+SET <컬럼1>=<값1>, ...  
+WHERE <조건문>;  
+###### DELETE  
+DELETE FROM <테이블명>  
+WHERE <조건절>;  
+###### TCL
+COMMIT : 트랜잭션을 완료하고 디스크에 반영한다.  
+COMMIT 후, 복구는 불가하다.  
+ROLLBACK : 트랜잭션을 취소한다. 마지막 COMMIT
+지점으로 돌아간다.  
+SAVEPOINT : ROLLBACK시 돌아가는 저장포인트를
+지정한다. (세이브포인트 동일이름 지정시 덮여쓰기
+됨)
+
+###### ORACLE COMMIT
+- DML(INSERT, UPDATE, DELETE) 는 사용자가 반드시
+  커밋 해주어야 데이터베이스에 반영된다.
+- DDL(CREATE, ALTER, DROP, TRUNCATE) 는 사용시
+  자동적으로 커밋이 이루어진다.
+###### SQL SERVER COMMIT
+- AUTO COMMIT OFF : DML, DDL 모두 커밋 요함
+- AUTO COMMIT ON : DML, DDL 모두 자동 커밋
+###### DELETE VS TRUNCATE
+  DELETE : ROLLBACK 으로 복구 가능  
+  TRUNCATE : 시스템 활용의 측면에서 TRUNCATE
+  시스템 부하가 적음  
+
+###### 트랜잭션의 특성
+  원자성 : 트랜잭션에서 정의된 연산들은 모두
+  성공적으로 실행되던지 아니면 전혀 실행되지 않은
+  상태로 남아있어야 한다.  
+  고립성 : 트랜잭션이 실행되는 도중에 다른
+  트랜잭션의 영향을 받아 잘못된 결과를 만들어서는
+  안된다.  
+  지속성 : 트랜잭션이 성공적으로 수행되면 그
+  트랜잭션이 갱신한 데이터베이스의 내용은 영구적으로
+  저장된다.  
+  일관성 : 트랜잭션이 실행되기 전의 데이터베이스
+  내용이 잘못 되어있지 않다면 트랜잭션이 실행된
+  이후에도 일관성 있는 데이터베이스를 유지한다.  
+
+
+###### DCL
+GRANT : 데이터베이스 사용자에게 권한을 부여하는
+것이다. 데이터베이스의 사용을 위해 데이터의
+연결,수정,입력,삭제,조회 등을 하게 해준다.  
+
+REVOKE : 데이터베이스 사용자에게 부여된 권한을
+회수한다.  
+GRANT <권한명> ON <객체명> TO <유저명>  
+REVOKE <권한명> ON <객체명> FROM <유저명>  
+
+###### ROLE
+사용자에게 허가할 수 있는 권한들의 집합  
+ROLE을 이용하면 권한 부여와 회수를 쉽게 할 수
+있다.  
+ROLE은 CREATE ROLE 권한을 가진 USER에 의해
+생성된다.  
+한 사용자가 여러 개의 ROLE을 가질 수 있고, 여러
+사용자에게 동일한 ROLE을 부여할 수 있다.  
+GRANT 와 REVOKE로 사용자에게 ROLE을 부여하고
+취소도 가능하다.  
+사용자는 ROLE에 ROLE을 부여하는 것도 가능하다.  
+
+###### 뷰(VIEW)
+뷰는 데이터베이스에서 제공하는 가상의 테이블을
+의미한다.  
+뷰를 사용하면 복잡한 쿼리문을 대신할 수 있기
+때문에 개발의 용이성을 가진다.  
+뷰는 뷰를 만들 때 사용한 쿼리문을 저장하는 것이며,
+뷰를 조회할 때는 뷰를 만들 때 사용한 쿼리문이
+동작한다.
+
+###### 이론상 뷰의 장점(빈출) <독.편.보>
+독립성 : 테이블 구조가 변경되어도 뷰를 사용하는
+응용프로그램은 변경하지 않아도 된다.
+편리성 : 복잡한 질의를 뷰로 생성함으로서 관련
+질의를 단순하게 작성할 수 있다.
+보안성 :숨기고 싶은 정보가 있다면 뷰를 생성할 시에
+해당 컬럼을 빼고 생성하여 사용자에게 정보를 감출
+수 있다.
