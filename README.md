@@ -13,7 +13,7 @@
   - [유니온 파인드(Union-Find)](./Algorithm/유니온파인드.md)
 - [☁️ AWS](./AWS/README.md)
 - [🗄️ Cache](./Cache/README.md)
-- [🌳 Data Structure](./Data_Structure/Data_Structure)
+- [🌳 Data Structure](./Data_Structure/Data_Structure.md)
 - [🎨 Design Pattern & Programming Paradigm](./DesignPattern&ProgramParadigm/README.md)
     - [🧩 Design Pattern](./DesignPattern&ProgramParadigm/DesignPattern.md)
     - [🕰️ Programming Paradigm](./DesignPattern&ProgramParadigm/ProgrammingParadigm.md)
